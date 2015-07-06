@@ -1,0 +1,125 @@
+<div class="col-xs-2" ng-init="getCategoryList()">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4><strong>实体类别</strong></h4>
+            <button class="btn btn-success btn-sm pull-right"
+                    ng-click="showCategoryDialog(null)">新类别</button>
+            <button class="btn btn-success btn-sm pull-right"
+                    ng-click="showDataTypeList()">数据类型</button>
+        </div>
+        <div class="list-group">
+            <a class="list-group-item" ng-repeat="category in category_list"
+                    ng-click="getOntologyList(category.id)">
+                <span class="badge">{{category.onto_count}}</span>
+                {{category.name}}
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="col-xs-10">
+    <div class="panel-group" id="ports" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-primary">
+            <div class="panel-heading " role="tab" id="{{select_category.id}}">
+                <h4 class="text-left">
+                    <strong>{{select_category.name}}</strong>
+                </h4>
+
+                <h4 class="panel-title">
+                    <button class="btn btn-primary btn-sm pull-right"
+                            ng-click="showCategoryDialog(select_category.id)">更名</button>
+                    <button class="btn btn-danger btn-sm pull-right"
+                            ng-click="deleteCategory(select_category.id)">删除</button>
+                    <button class="btn btn-success btn-sm pull-right"
+                            ng-click="showOntologyDialog(null)">新实体</button>
+                </h4>
+            </div>
+
+            <table class="table table-hover">
+                <tbody>
+                    <tr ng-repeat="ontology in ontology_list">
+
+
+                        <td valign="bottom" style="width:250px">
+                            <h7 class="text-left">{{ontology.title}}</h7>
+                        </td>
+
+                        <td class="text-right text-nowrap">
+                            <button class="btn btn-xs btn-success text-left"
+                                    ng-click="showOntology(ontology.id)">查看</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+<div class="push"></div>
+
+<div id="dlgCategory" class="modal fade"  visible="true" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">{{select_category.id}}</h4>
+            </div>
+            <div class="modal-body ">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">名称</label>
+                        <div  class="col-sm-9">
+                            <input class="form-control" ng-model="select_category.name">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary pull-right" data-dismiss="modal"
+                        ng-show="select_category.id == null" ng-click="createCategory()">创建</button>
+                <button type="button" class="btn btn-primary pull-right" data-dismiss="modal"
+                        ng-show="select_category.id != null" ng-click="updateCategoryName()">更新</button>
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="dlgOntology" class="modal fade"  visible="true" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">{{select_ontology.id}}</h4>
+            </div>
+            <div class="modal-body ">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">标题</label>
+                        <div  class="col-sm-9">
+                            <input class="form-control" ng-model="select_ontology.title">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">描述</label>
+                        <div class="col-sm-9">
+                            <textarea class="form-control" rows="3" ng-model="select_ontology.description"></textarea>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger pull-left" data-dismiss="modal"
+                        ng-show="select_ontology.id != null" ng-click="deleteOntology(select_ontology.id)">删除</button>
+                <button type="button" class="btn btn-primary pull-right" data-dismiss="modal"
+                        ng-show="select_ontology.id == null" ng-click="createOntology()">创建</button>
+                <button type="button" class="btn btn-primary pull-right" data-dismiss="modal"
+                        ng-show="select_ontology.id != null" ng-click="updateOntology()">更新</button>
+                <button type="button" class="btn btn-default pull-right" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
