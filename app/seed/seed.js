@@ -55,7 +55,7 @@ angular.module('seed', [])
             $scope.select_seed.level = "A";
             $scope.select_seed.reliability = "UNK";
             $scope.select_seed.statistics = {};
-            $scope.$apply();
+            //$scope.$apply();
         } else {
             //update
             $scope.select_seed = $.extend(true, {}, $scope.seed_list[id]);
@@ -152,7 +152,7 @@ angular.module('seed', [])
 
                 $scope.seed_count = Object.keys($scope.seed_list).length;
 
-                $scope.$apply();
+                //$scope.$apply();
             },
             error: function () {
                 alert("request fail.");
