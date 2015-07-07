@@ -66,7 +66,7 @@ angular.module('seed', [])
 
     $scope.createSeed = function() {
         $.ajax({
-            async: false,
+            async: true,
             type: "GET",
             url: url_api + "/seed/create",
             data: {seed: encodeURI(angular.toJson($scope.select_seed), "utf-8")},
