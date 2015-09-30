@@ -16,15 +16,37 @@ angular.module('seed', [])
 
     $scope.seed_count = 0;
 
+    $scope.page_size = 50;
+
+    $scope.page_count = 0;
+
+    $scope.page_id = 0;
+
+    $scope.search = {level: "0", reliability: "ALL", keyword: ""};
+
     $scope.seed_types = {
         smb: "SMB",
         web: "WEB"
+    };
+
+    $scope.search_levels = {
+        0: "所有",
+        A: "绝密",
+        B: "限制",
+        C: "公开"
     };
 
     $scope.seed_levels = {
         A: "绝密",
         B: "限制",
         C: "公开"
+    };
+
+    $scope.search_reliabilities = {
+        ALL: "所有来源",
+        GOV: "党政机关",
+        COM: "商业机构",
+        UNK: "不明来源"
     };
 
     $scope.seed_reliabilities = {
@@ -127,10 +149,14 @@ angular.module('seed', [])
             data: {id: id},
             dataType: "json",
             success: function(json) {
-                delete $scope.seed_list[id];
-                $scope.select_seed = {};
-                $scope.seed_count --;
-                $scope.$apply();
+                if (json == true) {
+                    delete $scope.seed_list[id];
+                    $scope.select_seed = {};
+                    $scope.seed_count --;
+                    $scope.$apply();
+                } else {
+                    alert("删除种子失败");
+                }
             },
             error: function() {
                 alert("request fail.");
@@ -138,19 +164,29 @@ angular.module('seed', [])
         });
     }
 
-    $scope.getSeedList = function() {
+    $scope.getSeedList = function(pageId) {
+        $scope.seed_list = {};
         $.ajax({
             async: false,
             type: "GET",
             url: url_api + "/seed/query",
-            data: {},
+            data: {keyword: $scope.search.keyword,
+                    level: $scope.search.level,
+                    reliability: $scope.search.reliability,
+                    pageNo: pageId,
+                    pageSize: $scope.page_size },
             dataType: "json",
             success: function (json) {
-                $.each(json, function(i, seed) {
+
+                $scope.seed_count = json.totalCount;
+                $scope.page_count = json.totalPage;
+                $scope.page_id = json.pageNo;
+
+                $.each(json.seeds, function(i, seed) {
                     $scope.seed_list[seed.id] = seed;
                 });
 
-                $scope.seed_count = Object.keys($scope.seed_list).length;
+                //$scope.seed_count = Object.keys($scope.seed_list).length;
 
                 //$scope.$apply();
             },
@@ -160,79 +196,95 @@ angular.module('seed', [])
         });
     }
 
-    $scope.startFetch = function(id) {
-        $.ajax({
-            async: false,
-            type: "GET",
-            url: url_api + "/seed/start/fetch",
-            data: {id:id},
-            dataType: "json",
-            success: function (json) {
-                $scope.seed_list[id] = json;
-                $scope.$apply();
-            },
-            error: function () {
-                alert("request fail.");
-            }
-        });
-    };
-
-    $scope.startAnalysis = function(id) {
-        $.ajax({
-            async: false,
-            type: "GET",
-            url: url_api + "/seed/start/analysis",
-            data: {id:id},
-            dataType: "json",
-            success: function (json) {
-                $scope.seed_list[id] = json;
-                $scope.$apply();
-            },
-            error: function () {
-                alert("request fail.");
-            }
-        });
-    }
-
-    $scope.stop = function(id) {
-        $.ajax({
-            async: false,
-            type: "GET",
-            url: url_api + "/seed/stop",
-            data: {id:id},
-            dataType: "json",
-            success: function (json) {
-                $scope.seed_list[id] = json;
-                $scope.$apply();
-            },
-            error: function () {
-                alert("request fail.");
-            }
-        });
-    };
-
-    $scope.showCrawl = function(id) {
-        $location.path("/crawl/" + id);
-    }
-
-    $scope.getPercentage = function(id) {
-        var task = $scope.seed_list[id].task;
-        if (task.finish == 0 && task.total == 0) {
-            return 0;
+    $scope.getPages = function() {
+        var pages = [];
+        if ($scope.page_id - 5 > 1) {
+            pages.push(1);
         }
-        var percent = ((task.finish * 100) / task.total).toFixed(4);
-        return percent;
+        for (var i = $scope.page_id - 5; i < $scope.page_id + 5; i++) {
+            if (i < 1)
+                continue;
+            pages.push(i);
+        }
+        if (($scope.page_id + 5) < $scope.page_count) {
+            pages.push($scope.page_count);
+        }
+        return pages;
     }
 
-    $scope.getTaskName = function(id) {
-        var task = $scope.seed_list[id].task;
-        if (task.type == "none") {
-            return "";
-        } else if (task.type == "FETCH") {
-            return "采集";
-        } else if (task.type == "ANALYSIS") {
-            return "分析";
-        }
-    }
+    //$scope.startFetch = function(id) {
+    //    $.ajax({
+    //        async: false,
+    //        type: "GET",
+    //        url: url_api + "/seed/start/fetch",
+    //        data: {id:id},
+    //        dataType: "json",
+    //        success: function (json) {
+    //            $scope.seed_list[id] = json;
+    //            $scope.$apply();
+    //        },
+    //        error: function () {
+    //            alert("request fail.");
+    //        }
+    //    });
+    //};
+    //
+    //$scope.startAnalysis = function(id) {
+    //    $.ajax({
+    //        async: false,
+    //        type: "GET",
+    //        url: url_api + "/seed/start/analysis",
+    //        data: {id:id},
+    //        dataType: "json",
+    //        success: function (json) {
+    //            $scope.seed_list[id] = json;
+    //            $scope.$apply();
+    //        },
+    //        error: function () {
+    //            alert("request fail.");
+    //        }
+    //    });
+    //}
+    //
+    //$scope.stop = function(id) {
+    //    $.ajax({
+    //        async: false,
+    //        type: "GET",
+    //        url: url_api + "/seed/stop",
+    //        data: {id:id},
+    //        dataType: "json",
+    //        success: function (json) {
+    //            $scope.seed_list[id] = json;
+    //            $scope.$apply();
+    //        },
+    //        error: function () {
+    //            alert("request fail.");
+    //        }
+    //    });
+    //};
+    //
+    //$scope.showCrawl = function(id) {
+    //    $location.path("/crawl/" + id);
+    //}
+    //
+    //$scope.getPercentage = function(id) {
+    //    var task = $scope.seed_list[id].task;
+    //    if (task.finish == 0 && task.total == 0) {
+    //        return 0;
+    //    }
+    //    var percent = ((task.finish * 100) / task.total).toFixed(4);
+    //    return percent;
+    //}
+    //
+    //$scope.getTaskName = function(id) {
+    //    var task = $scope.seed_list[id].task;
+    //    if (task.type == "none") {
+    //        return "";
+    //    } else if (task.type == "FETCH") {
+    //        return "采集";
+    //    } else if (task.type == "ANALYSIS") {
+    //        return "分析";
+    //    }
+    //}
 
 }]);

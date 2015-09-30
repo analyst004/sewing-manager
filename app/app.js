@@ -42,6 +42,10 @@ angular.module('sewing-manager',
               controller: 'SeedController',
               templateUrl: 'seed/seed.html'
             })
+            .when("/rcseed", {
+                controller: 'RCSeedController',
+                templateUrl: 'rcseed/rcseed.html'
+            })
             //.when("/entity/:id", {
             //    controller: 'EntityController',
             //    templateUrl: 'src/ontology/entity.html'
